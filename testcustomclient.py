@@ -23,7 +23,7 @@ class TestCustomClient(unittest.TestCase):
             "password": "hashpass"
         }
         out = encode_request(req)
-        # Should produce something like: "1|1|alice|hashpass\n"
+        # Testing what it produces, it should be the same 
         self.assertTrue(out.startswith("1|1|alice|hashpass"))
         self.assertTrue(out.endswith("\n"))
 
@@ -35,9 +35,9 @@ class TestCustomClient(unittest.TestCase):
             "content": "Hello Bob"
         }
         out = encode_request(req)
-        # e.g. "1|4|alice|bob|Hello Bob\n"
+        
         parts = out.strip().split("|")
-        self.assertEqual(parts[0], "1")  # version
+        self.assertEqual(parts[0], "1")  
         self.assertEqual(parts[1], "4")  # code for send_message
         self.assertEqual(parts[2], "alice")
         self.assertEqual(parts[3], "bob")
