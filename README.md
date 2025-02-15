@@ -208,6 +208,16 @@ Below are common steps a user might do in the GUI:
   - **`decode_request`**: Ensures valid JSON is parsed, and invalid JSON triggers an error.
   - **`encode_response`**: Ensures the final JSON string includes a newline and can be re-parsed.
   - **Handler functions**: For example, a test that calls `login(request)` with a correct password checks the returned `"status"` is `"ok"`.
+  - Use the following commands to test:
+  
+python -m coverage run -m unittest testcustomclient.py
+python -m coverage report -m
+
+
+python -m coverage run -m unittest testcustomserver.py
+python -m coverage run -m unittest testcustomclient.py
+python -m coverage report -m
+
 - Example test steps (pseudocode):
   ```python
   def test_decode_request_valid_json(self):
