@@ -1,6 +1,6 @@
 # Chat Application Documentation
 
-This document provides an **a guide** for our (Group 54) Chat Client/Server application in Python. The application supports **two wire protocol implementations**:
+This document provides an **a guide** for our Chat Client/Server application in Python. The application supports **two wire protocol implementations**:
 
 1. A **Custom Wire Protocol** (a delimited text format).  
 2. A **JSON-Based Wire Protocol** (messages serialized/deserialized with JSON).
@@ -115,22 +115,22 @@ This **Chat Application** consists of:
    - Tkinter library (often preinstalled on Windows/macOS; on some Linux distros, you may install it via `sudo apt-get install python3-tk`).
 
 2. **Obtaining the Code**:
-   - Place the server script (e.g. `server.py`) and client script (e.g. `client.py`) in the same directory (or structured as you like).
+   - Place the server script (e.g. `custom_server.py`) and client script (e.g. `custom_client.py`) in the same directory (or structured as you like).
    - A `logs/` directory is automatically created for storing log files.
 
 3. **Running the Server**:
    ```bash
-   python server.py
+   python custom_server.py
    ```
    - By default, it listens on `0.0.0.0:4999`.  
-   - To change the port or host, edit `HOST` and `PORT` at the top of `server.py`.
+   - To change the port or host, edit `server_port` and `client_connect_host` in the `config.json`.
 
 4. **Running the Client**:
    ```bash
-   python client.py
+   python custom_client.py
    ```
    - A GUI window opens.  
-   - If your server is on a different IP or port, adjust `SERVER_HOST` / `SERVER_PORT` inside `client.py`.  
+   - If your server is on a different IP or port, adjust inside of `config.json`.  
    - The client logs to `logs/chat_client_<timestamp>.log`.
 
 ---
@@ -226,7 +226,7 @@ Below are common steps a user might do in the GUI:
 ## 8. Troubleshooting
 
 1. **Cannot connect to server**  
-   - Ensure the **server** is running and that **IP/port** match your `client.py` settings.  
+   - Ensure the **server** is running and that **IP/port** match your `custom_client.py` settings.  
    - Check firewall or antivirus that may block incoming connections.
 
 2. **Server closes connection immediately**  
@@ -256,5 +256,4 @@ Below are common steps a user might do in the GUI:
 ---
 ---
 
-**End of Documentation** 
-
+**End of Documentation**  
