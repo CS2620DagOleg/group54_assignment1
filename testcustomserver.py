@@ -16,7 +16,7 @@ from server2 import (
 
 class TestCustomServer(unittest.TestCase):
     def setUp(self):
-        # Clear or reset the in-memory database before each test
+        # Clearing database before testing, cleaning what is in the memory
         users_db.clear()
 
     def test_decode_request_version_code(self):
@@ -34,7 +34,7 @@ class TestCustomServer(unittest.TestCase):
         self.assertIn("Unsupported version", req["error"])
 
     def test_decode_request_not_enough_fields(self):
-        # e.g. code=4 is "send_message" but we only supply 2 fields (not enough)
+        
         line = "1|4|alice"
         req = decode_request(line)
         self.assertEqual(req["type"], "unknown")
@@ -44,7 +44,7 @@ class TestCustomServer(unittest.TestCase):
         resp = {"status": "ok", "data": ["Account created", "ExtraField"]}
         encoded = encode_response(resp)
         self.assertTrue(encoded.startswith("OK|"))
-        # e.g. "OK|Account created|ExtraField\n"
+        
         self.assertTrue(encoded.endswith("\n"))
         self.assertIn("Account created", encoded)
 
@@ -54,9 +54,9 @@ class TestCustomServer(unittest.TestCase):
         self.assertTrue(encoded.startswith("ERROR|"))
         self.assertIn("Something went wrong", encoded)
 
-    # --------------------------------------------------------------------------
+    
     # Test the handler functions individually
-    # --------------------------------------------------------------------------
+    
     def test_create_account_success(self):
         req = {"username": "alice", "password": "secret"}
         resp = create_account(req)
@@ -85,7 +85,7 @@ class TestCustomServer(unittest.TestCase):
         req = {"username": "bob", "pattern": "a"}
         resp = list_accounts(req)
         self.assertEqual(resp["status"], "ok")
-        # data might look like ["alice,carol"] => so we split on comma
+        # splitting on comma 
         matches = resp["data"][0].split(",")
         self.assertEqual(set(matches), {"alice", "carol"})
 
@@ -109,9 +109,9 @@ class TestCustomServer(unittest.TestCase):
         req = {"username": "bob", "count": 1}
         resp = read_new_messages(req)
         self.assertEqual(resp["status"], "ok")
-        # data[0] should be number of messages, e.g. "1"
+        # checking on number of messages 
         self.assertEqual(resp["data"][0], "1")
-        # The 2nd message is still unread
+        # what message is not read 
         self.assertFalse(users_db["bob"]["messages"][1]["read"])
 
     def test_delete_messages_some(self):
@@ -147,13 +147,13 @@ class TestCustomServer(unittest.TestCase):
         req = {"username": "eve"}
         resp = list_messages(req)
         self.assertEqual(resp["status"], "ok")
-        # Only the read messages are returned
+        # What messages are returned? only the read messages should be the ones returned 
         self.assertEqual(resp["data"][0], "1")  # number of messages returned
         self.assertIn("ReadOne", resp["data"][1])
 
-    # --------------------------------------------------------------------------
-    # Test the top-level handle_request dispatcher
-    # --------------------------------------------------------------------------
+    
+    # Test the top-level handle_request, make sure to test 
+    
     def test_handle_request_unknown(self):
         req = {"type": "unknown"}
         resp = handle_request(req)
