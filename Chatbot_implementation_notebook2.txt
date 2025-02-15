@@ -1,0 +1,200 @@
+Project 1 engineering notebook - Group 54 - Oleg 
+
+
+
+
+
+|------|
+| D-8  |
+|------|
+
+We started by thinking through design of our system and what language and tools might fit the requirements. We paid special attention to compatibility of tools we planned on using.
+We decided to go with Python due to comfortability with the language and previous experience with creating tkinter simply gui. 
+
+- Networking wise, we plan on building on TCP. 
+
+- Concerning Security, we decided to hash passwords using SHA-256 before sending them to the server. This adds basic security so passwords aren’t sent as plain text. A better option would be bcrypt (which adds extra security), but for now, this was enough.
+
+- Scalability consideration and multiple clients ideation: The server handles each client in a separate thread, so multiple users can connect at once. In the future, we could switch to an async model (asyncio) for even better performance.
+
+
+
+
+
+|------|
+| D-6  |
+|------|
+
+client system layout:
+- divided by user status:
+	- initial window containing 'Create Account', 'Login', and 'Exit'
+	- logged in window containing all of the functionality 
+
+--> that is, user can:
+- Create account
+- Login
+- List accounts
+	- will operate on wild card functionality
+	- blank will display all acounts 
+- Send message
+- Read new messages (specify number or leave blank for all)
+- Show all messages (once got through 'Read new messages') 
+	- here, the user can also delete messages
+- Delete account
+	- we decided to delete unread messages, user will be notified that this will happen
+
+
+- thought through storage requirement: since persistent storage is not required for now, we decided to with simple Python dict db. 
+
+format design example for storage:
+
+users_db = {
+  "alice": {
+    "password": "<hashed_password>",
+    "messages": [
+      {
+        "from": "bob",
+        "content": "Hello",
+        "read": False,
+        "timestamp": "02/10 14:37"
+      },
+      ...
+    ]
+  },
+  "bob": {...},
+  ...
+}
+
+- for custom protocol, the intent is to use \n deliniated format with '|' separating each field.  Each transmission will start with version, followed by operation type, followed by further specified number of fields that depends on the operation requirement. 
+
+
+Transmission before being encoded by Python's socket will look like this:
+
+version|code|field1|field2|...|fieldN\n
+
+So user creation operation will look like this:
+
+ 1|1|alice|<hashed_password>\n
+
+
+client-server logging implementation to include ok/error response:
+- create 'logs' folder if not already created. 
+- include timedate stamp, specify direction, list size, action type, success status 
+- do this for both client and server 
+
+low level wire protocol implementation:
+- we decided to go with IPv4 for the sake of compatibility and simplicity
+- we used Python's socket interface
+
+
+
+
+|------|
+| D-4  |
+|------|
+
+
+JSON protocol:
+- building on GUI and design decisions in our custom protocol, we built JSON implementation for the wire protocol.
+
+structure of our json:
+
+{"type": "login", "username": "alice", "password": "somehash"}\n
+
+
+
+testing
+- we expanced our logging and systems testing to include modular and atomic features, that is implemented testing using Python's unittest, focusing on each instance of functionality for both client and server for custom and json implementations
+- we used mock-ups for tkinterface GUI 
+
+
+
+
+
+
+|------|
+| D-3  |
+|------|
+
+
+small improvements:
+- to enable quicker debugging and testing and for improved user experience, we added 'logged-in as:___" message to the logged-in window as part of GUI
+- to improve user experience, instead of using message ids to delete messages, we added checkboxes that will enable the user to select which messages to delete using GUI
+
+
+documentation:
+- we began creating an outline for documentation, aiming to keep it straighforward while thorough enough to explain the functioning of our system.
+
+
+
+
+
+|------|
+| D-2  |
+|------|
+
+
+Efficiency improvement of the custom protocol:
+- to decrease the size we decided to number code the operations in our custom protocol, rather than keeping it as an english description of the operation such as login, read_all_msgs, etc. 
+- to maintain readibility in rest of the code, we created a map that would ensure operation digit would transfer over wire, while maintaing english description in the rest of the code 
+
+
+Code readability: 
+- we added short form explanations to more complex functions so user can hover over a function and understand basic functionality 
+- went over comments throughout to clean them up 
+
+
+
+
+|------|
+| D-1  |
+|------|
+
+
+IPv4 communication testing:
+- to ensure functioning during demo, we aimed to use a network we knew enabled incoming traffic to specific IPv4 address and port. We decided to use a hotspot from a laptop and communicate wirelessly while maintaining network domain. After a period of deconfliction, we determinted a default port of 4999 and local IPs for each of the machine. 
+- connection information was moved to config file for completeness 
+
+Final Integration testing:
+- we conducted all specified operations for the final time on the same network that we plan on using for demo day. 
+
+Testing coverage
+- we conducted analysis of our coverage to add quantitative assessment of our testing on top of continualy done hollistic assesment 
+
+Small improvements:
+- added next steps for possible future improvements of our system
+
+
+
+
+|-----------------------------------------------------------|
+|Comparison of Custom Wire Protocol and JSON Wire Protocol  |
+|-----------------------------------------------------------|
+
+
+After everything was implemented and tested, we took a closer look at how the two protocols compared.The custom wire protocol was significantly more bandwidth-efficient. The logs confirmed this—requests were much smaller in size compared to the JSON version.
+
+Take account creation as an example:
+
+-In the custom protocol, a request was 72 bytes, and the server response was 38 bytes.
+
+-In the JSON version, the same request was 125 bytes, and the response was 65 bytes.
+
+(note: for most other operations, custom protocol is even more efficient, but here the most of the size is taken by the encrypted password rather than key:value descriptors/custom protocol overhead) 
+
+
+These differences were consistent across all operations. The custom format removed unnecessary characters like {}, :, and ", keeping the message as compact as possible.That being said, the JSON protocol had its own advantages. It was much easier to debug, as JSON is human-readable and widely understood. The logs from the JSON implementation were cleaner, making it simpler to verify request contents. JSON also provided built-in validation—if a request was malformed, Python’s json.loads() would catch the issue immediately. 
+
+-The custom protocol required manual parsing and validation, which added complexity.In terms of extensibility, JSON was the clear winner. Adding new features (like extra metadata in messages) would be trivial in JSON, while the custom format would require modifying the parsing logic.The trade-offs were clear. If we needed maximum efficiency, the custom wire protocol was the better choice. If we needed flexibility and maintainability, JSON was the better option.
+
+
+
+
+|----------------------------------------|
+|              LLM USE NOTE	         |
+|----------------------------------------|
+
+During our implementation and troubleshooting, we used OpenAI models to aid in code syntax, search for shortcommings and brainstorm ideas for implementation and robustness
+
+
+
