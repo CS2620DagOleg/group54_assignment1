@@ -66,7 +66,7 @@ This **Chat Application** consists of:
 ## 3. Architecture and Flow
 
 1. **Server**:
-   - Listens on a specified **TCP port** (default `4999`).  
+   - Listens on a specified **TCP port**.  
    - Each new **client connection** is handled in a **separate thread**.  
    - Uses an in-memory dictionary (`users_db`) to track user passwords and messages.
    - Logs major events (connections, requests, etc.) to a file in `logs/`.
@@ -122,8 +122,8 @@ This **Chat Application** consists of:
    ```bash
    python custom_server.py
    ```
-   - By default, it listens on `0.0.0.0:4999`.  
-   - To change the port or host, edit `server_port` and `client_connect_host` in the `config.json`.
+   - To specify or change the port and host, edit `server_port` and `client_connect_host` in the `config.json`.
+   - If server is set to listen on '0.0.0.0', IP address does not need to be further specified on server-side. 
 
 4. **Running the Client**:
    ```bash
