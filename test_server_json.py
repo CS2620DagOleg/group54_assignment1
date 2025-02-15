@@ -37,14 +37,14 @@ class TestServerJSON(unittest.TestCase):
     def test_encode_response(self):
         resp = {"status": "ok", "data": ["Test message"]}
         encoded = encode_response(resp)
-        # Ensure it ends with \n
+        # End of File checkings
         self.assertTrue(encoded.endswith("\n"))
-        # Ensure it can be decoded back into the same dict
+        # Can we decode the thing back? 
         decoded = json.loads(encoded.strip())
         self.assertEqual(decoded["status"], "ok")
         self.assertEqual(decoded["data"], ["Test message"])
 
-    # ---- Core handler tests ----
+    # Some tests for handler files 
     def test_create_account_success(self):
         req = {
             "type": "create_account",
@@ -69,7 +69,7 @@ class TestServerJSON(unittest.TestCase):
         self.assertIn("Username already taken", response["error"])
 
     def test_login_success(self):
-        # Setup an existing user
+        # Defining a user 
         users_db["alice"] = {"password": "secret", "messages": []}
         req = {
             "type": "login",
@@ -79,7 +79,7 @@ class TestServerJSON(unittest.TestCase):
         response = login(req)
         self.assertEqual(response["status"], "ok")
         self.assertIn("logged in successfully", response["data"][0])
-        self.assertEqual(response["data"][1], "0")  # unread_count
+        self.assertEqual(response["data"][1], "0")  
 
     def test_login_wrong_password(self):
         users_db["alice"] = {"password": "secret", "messages": []}
@@ -98,7 +98,7 @@ class TestServerJSON(unittest.TestCase):
         req = {"type": "list_accounts", "pattern": ""}
         response = list_accounts(req)
         self.assertEqual(response["status"], "ok")
-        # The single string in response["data"] is "alice,bob" (order may vary)
+        # What would be the single string in response? 
         accounts = response["data"][0].split(",")
         self.assertEqual(set(accounts), {"alice", "bob"})
 
@@ -113,7 +113,7 @@ class TestServerJSON(unittest.TestCase):
         }
         response = send_message(req)
         self.assertEqual(response["status"], "ok")
-        # Bob should have a new unread message
+        # So Bob woudld not not read the message 
         self.assertEqual(len(users_db["bob"]["messages"]), 1)
         self.assertFalse(users_db["bob"]["messages"][0]["read"])
         self.assertEqual(users_db["bob"]["messages"][0]["content"], "Hello Bob")
@@ -134,9 +134,9 @@ class TestServerJSON(unittest.TestCase):
         }
         response = read_new_messages(req)
         self.assertEqual(response["status"], "ok")
-        # data[0] => number of messages returned
+        
         self.assertEqual(response["data"][0], "2")
-        # The first 2 messages are read
+        # We know that the first 2 messages are read 
         self.assertTrue(users_db["bob"]["messages"][0]["read"])
         self.assertTrue(users_db["bob"]["messages"][1]["read"])
         self.assertFalse(users_db["bob"]["messages"][2]["read"])
@@ -157,7 +157,7 @@ class TestServerJSON(unittest.TestCase):
         }
         response = delete_messages(req)
         self.assertEqual(response["status"], "ok")
-        # Now only the middle message remains
+        # Making the middle message remain for testing 
         self.assertEqual(len(users_db["charlie"]["messages"]), 1)
         self.assertEqual(users_db["charlie"]["messages"][0]["content"], "Yo")
 
