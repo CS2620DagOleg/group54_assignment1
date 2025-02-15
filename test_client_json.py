@@ -12,16 +12,16 @@ from clientjson import (
 class TestClientJSON(unittest.TestCase):
     def test_hash_password(self):
         pwd_hash = hash_password("secret")
-        # Just check it's a valid hex string of length 64 for SHA-256
+        # checking that it is a valid string
         self.assertTrue(len(pwd_hash) == 64)
         self.assertTrue(all(c in "0123456789abcdef" for c in pwd_hash))
 
     def test_encode_request(self):
         req = {"type": "login", "username": "alice"}
         encoded = encode_request(req)
-        # We need it to produce a json string with a new line
+        # Now, proceed to producing a json string
         self.assertTrue(encoded.endswith("\n"))
-        # Strip newline and decode as JSON
+        # debugging statement to stripping a new json line
         data = json.loads(encoded.strip())
         self.assertEqual(data["type"], "login")
         self.assertEqual(data["username"], "alice")
@@ -33,7 +33,6 @@ class TestClientJSON(unittest.TestCase):
         self.assertEqual(decoded["data"], ["Test message"])
 
     def test_decode_response_invalid(self):
-        # Missing brace
         resp_str = '{"status": "ok", "data": ["Test message"]'
         decoded = decode_response(resp_str)
         self.assertEqual(decoded["status"], "error")
@@ -47,7 +46,7 @@ class TestClientJSON(unittest.TestCase):
         mock_socket_instance = MagicMock()
         mock_socket_class.return_value = mock_socket_instance
 
-        # Simulation of the server to send a json response
+        # Simulate the event in which the jsobn sends a response
         mock_socket_instance.recv.side_effect = [
             b'{"status": "ok", "data": ["All good"]}\n'
         ]
@@ -59,7 +58,7 @@ class TestClientJSON(unittest.TestCase):
         self.assertEqual(response["status"], "ok")
         self.assertEqual(response["data"], ["All good"])
 
-        # The socket needs to receive the right thing
+        # Making sure the socket is receiving the right thing
         sent_data = mock_socket_instance.sendall.call_args[0][0]
         self.assertIn(b'"type": "login"', sent_data)
         self.assertIn(b'"username": "alice"', sent_data)
@@ -71,7 +70,7 @@ class TestClientJSON(unittest.TestCase):
         """
         mock_socket_instance = MagicMock()
         mock_socket_class.return_value = mock_socket_instance
-        # Server then says the connection is closed
+        # Server closing the connection 
         mock_socket_instance.recv.side_effect = [b'']
 
         s = socket.socket()
